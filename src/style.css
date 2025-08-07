@@ -1,0 +1,91 @@
+@import "tailwindcss";
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f7fa;
+    color: #222222;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    color: #2d3748;
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+form {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+label {
+    font-weight: 500;
+    color: #4a5568;
+    margin-bottom: 0,5rem;
+    display: block;
+}
+
+input[type="text"], input[type='email'], input[type='tel'] {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+input:focus {
+    border-color: #3182ce;
+    outline: none;
+}
+
+button {
+    background: #3182ce;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 18px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background: #2563eb;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+li {
+    background: #f1f5f9;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between
+}
+
+p {
+    font-size: 1rem;
+    color: #2563eb;
+    text-align: center;
+}
+
+@media (max-width: 700px) {
+    form {
+        padding: 1rem
+    }
+    h1 {
+        font-size:2rem;
+    }
+}
