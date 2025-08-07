@@ -1,121 +1,40 @@
 import React, { useState } from "react";
 import "./style.css";
 
-// Component to display a single resume
-function ResumeDisplay({ resume }) {
-  if (!resume) {
-    return (
-      <div className="text-center text-gray-600">No resume data available.</div>
-    );
-  }
-
-  return (
-    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
-      <h3 className="text-3xl font-bold text-blue-700 mb-4 text-center">
-        {resume.name}
-      </h3>
-      <div className="space-y-4">
-        <p className="text-gray-700">
-          <strong className="text-gray-800">Email:</strong> {resume.email}
-        </p>
-        <p className="text-gray-700">
-          <strong className="text-gray-800">Phone:</strong> {resume.phone}
-        </p>
-        <p className="text-gray-700">
-          <strong className="text-gray-800">Summary:</strong> {resume.summary}
-        </p>
-
-        {resume.experience && resume.experience.length > 0 && (
-          <div className="border-t pt-4 mt-4 border-gray-200">
-            <h4 className="text-xl font-semibold text-gray-700 mb-3">
-              Experience
-            </h4>
-            <ul className="list-disc list-inside space-y-2 pl-4">
-              {resume.experience.map((exp, index) => (
-                <li key={index} className="text-gray-700">
-                  <strong>{exp.company}</strong> - {exp.role} ({exp.startDate}{" "}
-                  to {exp.endDate || "Present"})
-                  {exp.description && (
-                    <p className="text-sm text-gray-600 ml-4">
-                      {exp.description}
-                    </p>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {resume.education && resume.education.length > 0 && (
-          <div className="border-t pt-4 mt-4 border-gray-200">
-            <h4 className="text-xl font-semibold text-gray-700 mb-3">
-              Education
-            </h4>
-            <ul className="list-disc list-inside space-y-2 pl-4">
-              {resume.education.map((edu, index) => (
-                <li key={index} className="text-gray-700">
-                  <strong>{edu.institution}</strong> - {edu.degree}{" "}
-                  {edu.fieldOfStudy && `(${edu.fieldOfStudy})`}
-                  {edu.graduationYear && (
-                    <span className="text-sm text-gray-600">
-                      {" "}
-                      (Graduation: {edu.graduationYear})
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {resume.skills && resume.skills.length > 0 && (
-          <div className="border-t pt-4 mt-4 border-gray-200">
-            <h4 className="text-xl font-semibold text-gray-700 mb-3">Skills</h4>
-            <ul className="flex flex-wrap gap-2">
-              {resume.skills.map((skill, index) => (
-                <li
-                  key={index}
-                  className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
-                >
-                  {skill}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 // Component to view a resume by ID
 function ResumeViewer() {
   const [resumeIdInput, setResumeIdInput] = useState("");
-  const [viewedResume, setViewedResume] = useState(null);
+  const [viewedHtml, setViewedHtml] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleViewResume = async () => {
     if (!resumeIdInput) {
       setError("Please enter a Resume ID.");
-      setViewedResume(null);
+      setViewedHtml(null);
       return;
     }
 
     setLoading(true);
     setError("");
-    setViewedResume(null);
+    setViewedHtml(null);
 
     try {
-      const res = await fetch(`http://localhost:5000/resumes/${resumeIdInput}`);
+      const res = await fetch(
+        `http://localhost:5000/resumes/${resumeIdInput}/template`
+      );
       if (res.ok) {
-        const data = await res.json();
-        setViewedResume(data);
+        const html = await res.text();
+        setViewedHtml(html);
       } else {
-        const errorData = await res.json();
-        setError(
-          "Error fetching resume: " + (errorData.message || "Resume not found.")
-        );
+        let errorMessage = "Resume not found.";
+        try {
+          const errorData = await res.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          errorMessage = await res.text();
+        }
+        setError("Error fetching resume: " + errorMessage);
       }
     } catch (err) {
       setError("Network error: " + err.message);
@@ -126,7 +45,7 @@ function ResumeViewer() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 flex items-center justify-center p-4 font-inter">
-      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-2xl">
+      <div className="bg-white p-8 rounded-2xl shadow-xl w-[90vw]">
         <h1 className="text-4xl font-extrabold text-center text-gray-800 mb-8">
           View Your Resume
         </h1>
@@ -155,7 +74,15 @@ function ResumeViewer() {
           {error && <p className="text-red-600 text-center mt-2">{error}</p>}
         </div>
 
-        {viewedResume && <ResumeDisplay resume={viewedResume} />}
+        {viewedHtml && (
+          <div className="border-t pt-4 mt-4 border-gray-200 bg-gray-50">
+            <iframe
+              srcDoc={viewedHtml}
+              title="Resume Preview"
+              className="w-full h-[600px] border-0"
+            />
+          </div>
+        )}
       </div>
     </div>
   );
